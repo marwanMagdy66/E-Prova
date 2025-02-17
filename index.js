@@ -15,7 +15,7 @@ app.use("/auth", AuthRouter);
 app.use("/category", CategoryRouter);
 ///Page not found handler
 app.all("*", (req, res, next) => {
-  return next(new Error(`Route ${req.originalUrl} not found in this server`));
+  return next(new Error(`Route  not found in this server`));
 });
 
 //global error handler
