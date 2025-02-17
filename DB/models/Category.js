@@ -14,15 +14,6 @@ const CategorySchema=new Schema({
         min:10,
         max:100
     },
-    slug:{
-        type:String,
-        require:true,
-        unique:true
-    },
-    image:{
-        id:{type:String},
-        url:{type:String}
-    },
 
     gender:{
         type:String,
@@ -34,3 +25,5 @@ const CategorySchema=new Schema({
 {timestamps:true})
 
 export const Category=model("Category",CategorySchema)
+
+CategorySchema.index({ name: 1, gender: 1 }, { unique: true });

@@ -12,12 +12,11 @@ await connectDB();
 
 //routes
 app.use("/auth", AuthRouter);
-<<<<<<< Updated upstream
-app.use("/category", CategoryRouter);
-=======
+
+
 app.use("/Category", CategoryRouter);
 
->>>>>>> Stashed changes
+
 ///Page not found handler
 app.all("*", (req, res, next) => {
   return next(new Error(`Route  not found in this server`));
