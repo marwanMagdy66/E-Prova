@@ -30,5 +30,7 @@ router.delete("/deleteCategory/:id",isAuth,
     validate(CategorySchema.deleteCategory),
     ControllerCategory.deleteCategory)
 
+router.get('/menCategories',ControllerCategory.menCategories)
+
 
 export default router;
