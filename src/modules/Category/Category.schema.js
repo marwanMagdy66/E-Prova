@@ -1,4 +1,4 @@
-import joi from 'joi';
+import joi from "joi";
 import { isValidObjectId } from "../../middleware/validation.js"
 
 export const createCategory=joi.object({

@@ -10,14 +10,10 @@ import randomstring from "randomstring";
 ////register
 export const register = asyncHandler(async (req, res, next) => {
   const {
-    name,
+    username,
     email,
     password,
     confirmPassword,
-    phone,
-    address,
-    gender,
-    role,
   } = req.body;
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -30,7 +26,7 @@ export const register = asyncHandler(async (req, res, next) => {
 
   const token = jwt.sign(
     {
-      name,
+      username,
       email,
     },
     process.env.SECRET_KEY
@@ -46,7 +42,7 @@ export const register = asyncHandler(async (req, res, next) => {
     html: `
       <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ddd; border-radius: 10px; max-width: 500px; margin: auto;">
         <h2 style="color: #007bff;">Welcome to E-Prova Shop! 🎉</h2>
-        <p style="font-size: 16px; color: #333;">Hello <strong>${name}</strong>,</p>
+        <p style="font-size: 16px; color: #333;">Hello <strong>${username}</strong>,</p>
         <p style="font-size: 16px; color: #333;">We're thrilled to have you join us! To get started, please activate your account by clicking the button below:</p>
         <a href="${URL}" style="display: inline-block; padding: 12px 20px; font-size: 16px; color: #fff; background-color: #007bff; text-decoration: none; border-radius: 5px; margin-top: 10px;">
           Activate My Account
@@ -86,37 +82,31 @@ export const activate_account = asyncHandler(async (req, res, next) => {
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
+  
   if (!user) {
-    return next(
-      new Error("Invalid email or password. Please try again.", { cause: 401 })
-    );
+    return next(new Error("Invalid email or password. Please try again.", { cause: 401 }));
   }
 
   if (!user.isConfirmed) {
-    return next(
-      new Error(
-        "Your account is not activated. Please check your email for the activation link.",
-        { cause: 403 }
-      )
-    );
+    return next(new Error("Your account is not activated. Please check your email for the activation link.", { cause: 403 }));
   }
 
   const isMatch = await bcryptjs.compare(password, user.password);
   if (!isMatch) {
-    return next(
-      new Error("Invalid email or password. Please try again.", { cause: 401 })
-    );
+    return next(new Error("Invalid email or password. Please try again.", { cause: 401 }));
   }
 
-  const token = jwt.sign({ email, id: user._id }, process.env.SECRET_KEY, {
-    expiresIn: "1h",
+  const accessToken = jwt.sign({ email, id: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",  
+    sameSite: "Strict", 
+    maxAge: 60 * 60 * 1000, 
   });
-  await Token.create({ token, userId: user._id });
 
-  return res.json({ success: true, message: "Logged in successfully", token });
+  return res.json({ success: true, message: "Logged in successfully" });
 });
-
-
 
 // forget password
 export const forgetCode = asyncHandler(async (req, res, next) => {

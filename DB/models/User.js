@@ -2,7 +2,7 @@ import { model, Schema } from "mongoose";
 import bcryptjs from "bcryptjs";
 export const userSchema = new Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
       min: 3,
@@ -34,7 +34,6 @@ export const userSchema = new Schema(
     },
     role: {
       type: String,
-      required: true,
       enum: ["admin", "customer"],
       default: "customer",
     },
