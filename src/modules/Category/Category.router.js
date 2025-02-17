@@ -5,9 +5,10 @@ import { validate } from "../../middleware/validation.js";
 import {fileUpload} from "../../utils/multer.js"
 import * as ControllerCategory from "./Category.controller.js";
 import * as CategorySchema from "./Category.schema.js";
+import productRouter from '../Product/Product.routes.js';
 const router = Router();
 
-//router.use("/products",productRouter)
+router.use("/products",productRouter)
 //get category
 router.get("/categories", ControllerCategory.getCategory);
 
