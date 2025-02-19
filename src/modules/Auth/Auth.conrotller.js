@@ -105,7 +105,7 @@ export const login = asyncHandler(async (req, res, next) => {
     maxAge: 60 * 60 * 1000, 
   });
 
-  return res.json({ success: true, message: "Logged in successfully" });
+  return res.json({ success: true, message: "Logged in successfully", accessToken});
 });
 
 // forget password
