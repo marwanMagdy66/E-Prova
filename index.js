@@ -4,7 +4,7 @@ import { connectDB } from "./DB/connection.js";
 import AuthRouter from "./src/modules/Auth/Auth.routes.js";
 import CategoryRouter from "./src/modules/Category/Category.router.js";
 import productRouter from "./src/modules/Product/Product.routes.js";
-import brandRouter from './src/modules/Brand/Brand.routes.js'
+import brandRouter from "./src/modules/Brand/Brand.router.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 dotenv.config();
@@ -26,8 +26,10 @@ await connectDB();
 //routes
 app.use("/auth", AuthRouter);
 app.use("/Category", CategoryRouter);
+
 app.use('/Brand',brandRouter)
-// app.use("/product", productRouter);
+
+app.use("/Product", productRouter);
 ///Page not found handler
 app.all("*", (req, res, next) => {
   return next(new Error(`Route  not found in this server`));

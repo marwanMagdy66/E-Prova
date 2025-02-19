@@ -15,10 +15,6 @@ router.use("/:category/product", productRouter);
 //get category
 router.get("/categories", ControllerCategory.getCategory);
 
-
-
-
-
 //create category
 router.post(
   "/create-category",
@@ -27,8 +23,6 @@ router.post(
   validate(CategorySchema.createCategory),
   ControllerCategory.createCategory
 );
-
-
 
 
 //update category
