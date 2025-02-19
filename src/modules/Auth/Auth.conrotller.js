@@ -33,8 +33,8 @@ export const register = asyncHandler(async (req, res, next) => {
   );
 
   await User.create({ ...req.body });
-
-  const URL = `http://localhost:3000/auth/activate_account/${token}`;
+  const BASE_URL = process.env.BASE_URL || "http://localhost:3000"; 
+  const URL = `${BASE_URL}/auth/activate_account/${token}`;
 
   const sendMail = await sendEmail({
     to: email,

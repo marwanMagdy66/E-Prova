@@ -8,6 +8,10 @@ import productRouter from "../Product/Product.routes.js";
 const router = Router();
 
 router.use("/:category/product", productRouter);
+
+
+
+
 //get category
 router.get("/categories", ControllerCategory.getCategory);
 
@@ -17,7 +21,7 @@ router.get("/categories", ControllerCategory.getCategory);
 
 //create category
 router.post(
-  "/createCategory",
+  "/create-category",
   isAuth,
   isAuthorized("admin"),
   validate(CategorySchema.createCategory),
@@ -29,7 +33,7 @@ router.post(
 
 //update category
 router.patch(
-  "/updateCategory/:id",
+  "/update-category/:id",
   isAuth,
   isAuthorized("admin"),
   validate(CategorySchema.updateCategory),
@@ -38,15 +42,15 @@ router.patch(
 
 //delete category
 router.delete(
-  "/deleteCategory/:id",
+  "/delete-category/:id",
   isAuth,
   isAuthorized("admin"),
   validate(CategorySchema.deleteCategory),
   ControllerCategory.deleteCategory
 );
 
-router.get("/menCategories", ControllerCategory.menCategories);
+router.get("/men-categories", ControllerCategory.menCategories);
 
-router.get("/womenCategories", ControllerCategory.womenCategories);
+router.get("/women-categories", ControllerCategory.womenCategories);
 
 export default router;
