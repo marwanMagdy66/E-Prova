@@ -40,6 +40,8 @@ export const createBrand = asyncHandler(async (req, res, next) => {
     });
 });
 
+
+
 export const deleteBrand = asyncHandler(async (req, res, next) => {
     const brand = await Brand.findByIdAndDelete(req.params.id);
     if (!brand) return next(new Error('Brand not found', 404));

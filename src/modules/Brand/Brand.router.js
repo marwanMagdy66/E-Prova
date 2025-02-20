@@ -3,8 +3,8 @@ import { isAuth } from "../../middleware/Authentication.js";
 import { isAuthorized } from "../../middleware/Authorization.js";
 import { fileUpload } from "../../utils/multer.js";
 import { validate } from "../../middleware/validation.js";
-import *as schemaBrand from "./Brand.schema.js"
-import *as controllerBrand from "./Brand.controller.js";
+import * as schemaBrand from "./brand.schema.js"
+import * as controllerBrand from "./Brand.controller.js";
 
 const router=Router();
 

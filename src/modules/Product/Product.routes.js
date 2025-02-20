@@ -5,13 +5,17 @@ import { isAuth } from "../../middleware/Authentication.js";
 import { isAuthorized } from "../../middleware/Authorization.js";
 import { validate } from "../../middleware/validation.js";
 import { fileUpload } from "../../utils/multer.js";
+
 const router = Router({ mergeParams: true });
 
 router.post(
   "/createProduct/:category",
   isAuth,
   isAuthorized("admin"),
-  fileUpload().single("product"),
+  fileUpload().fields([
+    { name: "defaultImage", maxCount: 1 },
+    { name: "images", maxCount: 5 },
+  ]).single("product"),
   validate(productSchema.create),
   productController.create
 );
