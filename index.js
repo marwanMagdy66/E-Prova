@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
   const allowedOrigins = [
     "http://localhost:3000", 
-    "http://localhost:5173", // لدعم Vite
+    "http://localhost:5173", 
     process.env.CLIENT_URL || "https://e-prova.vercel.app"
   ];
   
@@ -54,6 +54,8 @@ app.use("/Category", CategoryRouter);
 app.use('/Brand',brandRouter)
 
 app.use("/Product", productRouter);
+
+
 ///Page not found handler
 app.all("*", (req, res, next) => {
   return next(new Error(`Route  not found in this server`));

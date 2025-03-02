@@ -26,7 +26,7 @@ export const createBrand = asyncHandler(async (req, res, next) => {
     );
     const brand = await Brand.create({
         name: req.body.name,
-        image: { url: secure_url, id: public_id },
+        logo: { url: secure_url, id: public_id },
     });
     categories.forEach(async (categoryId) => {
         const category = await Category.findById(categoryId);

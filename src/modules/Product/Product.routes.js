@@ -8,16 +8,32 @@ import { fileUpload } from "../../utils/multer.js";
 
 const router = Router({ mergeParams: true });
 
-// router.post(
-//   "/createProduct/:category",
-//   isAuth,
-//   isAuthorized("admin"),
-//   fileUpload().fields([
-//     { name: "defaultImage", maxCount: 1 },
-//     { name: "images", maxCount: 5 },
-//   ]).single("product"),
-//   validate(productSchema.create),
-//   productController.create
-// );
+router.post(
+  "/create-product",
+  isAuth,
+  isAuthorized("admin"),
+  fileUpload().fields([
+    { name: "defaultImage", maxCount: 1 },
+    { name: "images", maxCount: 5 },
+  ]),
+  validate(productSchema.create),
+  productController.create
+);
+
+
+router.delete(
+  "/delete-product/:id",
+  isAuth,
+  isAuthorized("admin"),
+  validate(productSchema.deleteProduct),
+  productController.deleteProduct
+);
+
+
+router.get(
+  "/",
+  productController.allProducts
+);
+
 
 export default router;
