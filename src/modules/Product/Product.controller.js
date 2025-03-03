@@ -104,6 +104,8 @@ export const allProducts = asyncHandler(async (req, res, next) => {
   }
 
   let productQuery=Product.find(filter)
+  console.log(productQuery)
+
   if(keyword){
     productQuery=productQuery.search(keyword)
   }
