@@ -20,7 +20,6 @@ router.post(
   productController.create
 );
 
-
 router.delete(
   "/delete-product/:id",
   isAuth,
@@ -29,11 +28,18 @@ router.delete(
   productController.deleteProduct
 );
 
+router.get("/", productController.allProducts);
 
-router.get(
-  "/",
-  productController.allProducts
+router.patch(
+  "/update-product/:id",
+  isAuth,
+  isAuthorized("admin"),
+  fileUpload().fields([
+    { name: "defaultImage", maxCount: 1 },
+    { name: "images", maxCount: 5 },
+  ]),
+  validate(productSchema.updateProduct),
+  productController.updateProduct
 );
-
 
 export default router;

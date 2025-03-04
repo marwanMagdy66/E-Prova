@@ -28,3 +28,20 @@ export const deleteProduct = joi
     id: joi.string().custom(isValidObjectId).required(),
   })
   .required();
+
+export const updateProduct = joi.object({
+  id: joi.string().custom(isValidObjectId).required(),
+  name: joi.string(),
+  description: joi.string(),
+  price: joi.number(),
+  category: joi.string().custom(isValidObjectId),
+  stock: joi.number(),
+  attributes: joi.alternatives().try(
+    joi.object({
+      color: joi.string(),
+      sizes: joi.array().items(joi.string()),
+    }),
+    joi.string()
+  ),
+  brandId: joi.string().custom(isValidObjectId),
+});

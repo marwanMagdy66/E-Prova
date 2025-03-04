@@ -82,41 +82,100 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
-
-
 export const allProducts = asyncHandler(async (req, res, next) => {
   const { sort, page, keyword, category, brand } = req.query;
 
-  let filter = {}
+  let filter = {};
 
-  if (category){ 
+  if (category) {
     const categoryExists = await Category.findById(category);
-    if (!categoryExists) return next(new Error("Category not Found"))
-      filter.category = new Types.ObjectId(category);
+    if (!categoryExists) return next(new Error("Category not Found"));
+    filter.category = new Types.ObjectId(category);
   }
 
   if (brand) {
     const brandExists = await Brand.findById(brand);
     if (!brandExists) return next(new Error("Brand not Found"));
-    filter.brand =  new Types.ObjectId(brand);;
+    filter.brandId = new Types.ObjectId(brand);
   }
 
-  let productQuery=Product.find(filter)
-  console.log(productQuery)
-
-  if(keyword){
-    productQuery=productQuery.search(keyword)
+  let productQuery = Product.find(filter).populate("brandId");
+  if (keyword) {
+    productQuery = productQuery.search(keyword);
   }
-  if(sort){
-    productQuery=productQuery.sort(sort)
+  if (sort) {
+    productQuery = productQuery.sort(sort);
   }
   productQuery = productQuery.pagination(page);
   const products = await productQuery;
 
   return res.json({
     success: true,
-    products:products,
+    products: products,
+  });
+});
+
+export const updateProduct = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) return next(new Error("Product not found"));
+
+  product.name = req.body.name ? req.body.name : product.name;
+
+  product.price = req.body.price ? req.body.price : product.price;
+
+  product.description = req.body.description
+    ? req.body.description
+    : product.description;
+
+  if (req.body.brandId) {
+    const brandExist = await Brand.findById(req.body.brandId);
+    if (!brandExist) return next(new Error("Brand not found"));
+    product.brandId = req.body.brandId;
+  }
+
+  if (req.body.category) {
+    const categoryExist = await Category.findById(req.body.categoryExist);
+    if (!categoryExist) return next(new Error("Category not found"));
+    product.category = req.body.category;
+  }
+  const folder = product.name;
+
+  if (req.files?.defaultImage) {
+    if (product.defaultImage?.id) {
+      await cloudinary.uploader.destroy(product.defaultImage.id);
+    }
+    const uploadImage = await cloudinary.uploader.upload(
+      req.files.defaultImage[0].path,
+      { folder: `${process.env.CLOUD_FOLDER_NAME}/products/${folder}` }
+    );
+    product.defaultImage = {
+      id: uploadImage.public_id,
+      url: uploadImage.secure_url,
+    };
+  }
+
+  if (req.files?.images) {
+    for (let img of product.images) {
+      await cloudinary.uploader.destroy(img.id);
+    }
+    const subImages = [];
+    for (let file of req.files.images) {
+      const uploadImage = await cloudinary.uploader.upload(file.path, {
+        folder: `${process.env.CLOUD_FOLDER_NAME}/products/${folder}`,
+      });
+      subImages.push({
+        id: uploadImage.public_id,
+        url: uploadImage.secure_url,
+      });
+    }
+    product.images = subImages;
+  }
+
+  await product.save();
+
+  return res.json({
+    success: true,
+    message: "Product updated successfully",
+    product,
   });
 });
