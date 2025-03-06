@@ -11,7 +11,7 @@ export const register = joi
     //   .min(10)
     //   .max(15)
     //   .pattern(/^01[0-2,5]{1}[0-9]{8}$/),
-    // role: joi.string().valid("admin", "customer").required(),
+    //  role: joi.string().valid("admin", "customer"),
     // address: joi.string().required(),
     gender: joi.string().valid("male", "female").required(),
   })

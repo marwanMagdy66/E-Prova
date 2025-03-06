@@ -46,10 +46,11 @@ export const deleteBrand = asyncHandler(async (req, res, next) => {
     const brand = await Brand.findByIdAndDelete(req.params.id);
     if (!brand) return next(new Error('Brand not found', 404));
     /* 
-const products = await Product.find({ brandId: req.params.id });
+    const products = await Product.find({ brandId: req.params.id });
     if (products.length > 0) 
         return next(new Error("Cannot delete brand with existing products", { cause: 400 }));
-    await Category.updateMany({}, { $pull: { brands: req.params.id } }); */
+    await Category.updateMany({}, { $pull: { brands: req.params.id } });
+     */
 
     await cloudinary.uploader.destroy(brand.logo.id);
 

@@ -5,7 +5,7 @@ export const isAuth = asyncHandler(async (req, res, next) => {
   const token = req.headers["token"] || req.cookies?.accessToken;
 
   if (!token) {
-    return next(new Error("Token is required!", { cause: 400 }));
+    return next(new Error("Authentication required! Please login first.", { cause: 401 }));
   }
 
   try {

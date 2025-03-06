@@ -7,26 +7,29 @@ import productRouter from "./src/modules/Product/Product.routes.js";
 import brandRouter from "./src/modules/Brand/Brand.router.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import wishListRouter from "./src/modules/WishList/WishList.routes.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
 
 app.use(cookieParser());
-  const allowedOrigins = [
-    "http://localhost:3000", 
-    "http://localhost:5173", 
-    process.env.CLIENT_URL || "https://e-prova.vercel.app"
-  ];
-  
-app.use((req, res, next) => {
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  process.env.CLIENT_URL || "https://e-prova.vercel.app",
+];
 
+app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
   }
-  
+
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+  );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   if (req.method === "OPTIONS") {
@@ -51,9 +54,11 @@ await connectDB();
 app.use("/auth", AuthRouter);
 app.use("/Category", CategoryRouter);
 
-app.use('/Brand',brandRouter)
+app.use("/Brand", brandRouter);
 
 app.use("/Product", productRouter);
+
+app.use("/WishList", wishListRouter);
 
 
 ///Page not found handler

@@ -19,7 +19,7 @@ export const create = joi
         joi.string()
       )
       .required(),
-    brandId: joi.string().custom(isValidObjectId),
+    brandId: joi.string().custom(isValidObjectId).required(),
   })
   .required();
 
