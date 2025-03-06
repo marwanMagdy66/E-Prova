@@ -31,7 +31,7 @@ const productSchema = Schema(
       required: true,
     },
 
-    averageRating: { type: Number, min: 1, max: 5 },
+    averageRating: { type: Number, default: null },
   },
   {
     timestamps: true,
@@ -40,6 +40,12 @@ const productSchema = Schema(
     toObject: { virtuals: true },
   }
 );
+
+productSchema.virtual("review",{
+  ref:"Review",
+  localField:"_id",
+  foreignField:"productId",
+})
 
 productSchema.virtual("finalPrice").get(function () {
   return this.price - (this.price * this.discount) / 100;

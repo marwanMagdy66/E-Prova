@@ -5,8 +5,10 @@ import { isAuth } from "../../middleware/Authentication.js";
 import { isAuthorized } from "../../middleware/Authorization.js";
 import { validate } from "../../middleware/validation.js";
 import { fileUpload } from "../../utils/multer.js";
+import reviewRouter from "../Review/Review.router.js";
 
 const router = Router({ mergeParams: true });
+router.use("/:productId/review",reviewRouter);
 
 router.post(
   "/create-product",
