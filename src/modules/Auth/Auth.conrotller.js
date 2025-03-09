@@ -96,7 +96,7 @@ export const login = asyncHandler(async (req, res, next) => {
     return next(new Error("Invalid email or password. Please try again.", { cause: 401 }));
   }
 
-  const accessToken = jwt.sign({ email, id: user._id , role:user.role}, process.env.SECRET_KEY, { expiresIn: "1h" });
+  const accessToken = jwt.sign({ email, id: user._id , role:user.role}, process.env.SECRET_KEY, { expiresIn: "5m" });
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
