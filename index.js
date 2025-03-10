@@ -45,8 +45,11 @@ app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 //connect DB
 await connectDB();
