@@ -6,15 +6,9 @@ import { Token } from "../../../DB/models/Token.js";
 import bcryptjs from "bcryptjs";
 import randomstring from "randomstring";
 
-
 ////register
 export const register = asyncHandler(async (req, res, next) => {
-  const {
-    username,
-    email,
-    password,
-    confirmPassword,
-  } = req.body;
+  const { username, email, password, confirmPassword } = req.body;
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return next(new Error("Email already exists"));
@@ -33,7 +27,7 @@ export const register = asyncHandler(async (req, res, next) => {
   );
 
   await User.create({ ...req.body });
-  const BASE_URL = process.env.BASE_URL || "http://localhost:3000"; 
+  const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
   const URL = `${BASE_URL}/auth/activate_account/${token}`;
 
   const sendMail = await sendEmail({
@@ -63,8 +57,6 @@ export const register = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
 ///activate acc
 export const activate_account = asyncHandler(async (req, res, next) => {
   const { token } = req.params;
@@ -74,6 +66,7 @@ export const activate_account = asyncHandler(async (req, res, next) => {
     return next(new Error("User not found", { cause: 404 }));
   }
   user.isConfirmed = true;
+  await Cart.create({ userId: user._id });
   await user.save();
   return res.json({ success: true, message: "Account activated" });
 });
@@ -82,30 +75,47 @@ export const activate_account = asyncHandler(async (req, res, next) => {
 export const login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
-  
+
   if (!user) {
-    return next(new Error("Invalid email or password. Please try again.", { cause: 401 }));
+    return next(
+      new Error("Invalid email or password. Please try again.", { cause: 401 })
+    );
   }
 
   if (!user.isConfirmed) {
-    return next(new Error("Your account is not activated. Please check your email for the activation link.", { cause: 403 }));
+    return next(
+      new Error(
+        "Your account is not activated. Please check your email for the activation link.",
+        { cause: 403 }
+      )
+    );
   }
 
   const isMatch = await bcryptjs.compare(password, user.password);
   if (!isMatch) {
-    return next(new Error("Invalid email or password. Please try again.", { cause: 401 }));
+    return next(
+      new Error("Invalid email or password. Please try again.", { cause: 401 })
+    );
   }
 
-  const accessToken = jwt.sign({ email, id: user._id , role:user.role}, process.env.SECRET_KEY, { expiresIn: "1h" });
+  const accessToken = jwt.sign(
+    { email, id: user._id, role: user.role },
+    process.env.SECRET_KEY,
+    { expiresIn: "1h" }
+  );
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",  
-    sameSite: "Strict", 
-    maxAge: 60 * 60 * 1000, 
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+    maxAge: 60 * 60 * 1000,
   });
 
-  return res.json({ success: true, message: "Logged in successfully", accessToken});
+  return res.json({
+    success: true,
+    message: "Logged in successfully",
+    accessToken,
+  });
 });
 
 // forget password
