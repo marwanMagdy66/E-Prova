@@ -5,7 +5,7 @@ import { User } from "../../DB/models/User.js";
 
 
 export const isAuth = asyncHandler(async (req, res, next) => {
-  const token = req.headers["Authorization"] || req.cookies?.accessToken;
+  const token = req.headers["token"] || req.cookies?.accessToken;
 
   if (!token) {
     return next(new Error("Authentication required! Please login first.", { cause: 401 }));
