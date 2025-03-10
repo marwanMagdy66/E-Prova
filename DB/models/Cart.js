@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 const cartSchema = Schema(
   {
@@ -25,3 +25,5 @@ const cartSchema = Schema(
     timestamps: true,
   }
 );
+
+export const Cart = model("Cart", cartSchema);

@@ -5,6 +5,8 @@ import { sendEmail } from "../../utils/Mail.js";
 import { Token } from "../../../DB/models/Token.js";
 import bcryptjs from "bcryptjs";
 import randomstring from "randomstring";
+import { Cart } from "../../../DB/models/Cart.js";
+
 
 ////register
 export const register = asyncHandler(async (req, res, next) => {
