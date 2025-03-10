@@ -108,7 +108,7 @@ export const login = asyncHandler(async (req, res, next) => {
 
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: ture,
+    secure: true,
     sameSite: "None", // جرب "Lax" أو "None" لو الـ frontend والدومين مختلفين
     maxAge: 60 * 60 * 1000,
 });
