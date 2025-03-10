@@ -106,12 +106,12 @@ export const login = asyncHandler(async (req, res, next) => {
     { expiresIn: "1h" }
   );
 
-//   res.cookie("accessToken", accessToken, {
-//     httpOnly: true,
-//     secure: true,
-//     sameSite: "None", // جرب "Lax" أو "None" لو الـ frontend والدومين مختلفين
-//     maxAge: 60 * 60 * 1000,
-// });
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None", // جرب "Lax" أو "None" لو الـ frontend والدومين مختلفين
+    maxAge: 60 * 60 * 1000,
+});
 
   return res.json({
     success: true,
