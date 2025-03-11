@@ -25,9 +25,11 @@ const CategorySchema = new Schema(
     { timestamps: true }
 );
 
+CategorySchema.index({ name: 1, gender: 1 }, { unique: true });
+
 export const Category = model("Category", CategorySchema);
 
-CategorySchema.index({ name: 1, gender: 1 }, { unique: true });
+
 
 
 
