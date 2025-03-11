@@ -4,7 +4,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 
 export const add = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
-  console.log(userId);
+
   const { productsId } = req.body;
 
   const product = await Product.findById(productsId);
