@@ -13,7 +13,6 @@ export const isAuth = asyncHandler(async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, process.env.SECRET_KEY);
-    console.log(payload)
     const user = await User.findById(payload.id).select("-password");
 
     if (!user) {

@@ -6,6 +6,7 @@ import CategoryRouter from "./src/modules/Category/Category.router.js";
 import productRouter from "./src/modules/Product/Product.routes.js";
 import brandRouter from "./src/modules/Brand/Brand.router.js";
 import reviewRouter from "./src/modules/Review/Review.router.js";
+import cartRouter from './src/modules/Cart/Cart.router.js';
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import wishListRouter from "./src/modules/WishList/WishList.routes.js";
@@ -65,7 +66,7 @@ app.use("/Product", productRouter);
 app.use("/Review", reviewRouter);
 
 app.use("/WishList", wishListRouter);
-
+app.use('/Cart',cartRouter)
 
 ///Page not found handler
 app.all("*", (req, res, next) => {

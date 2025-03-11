@@ -41,11 +41,11 @@ const productSchema = Schema(
   }
 );
 
-productSchema.virtual("review",{
-  ref:"Review",
-  localField:"_id",
-  foreignField:"productId",
-})
+productSchema.virtual("review", {
+  ref: "Review",
+  localField: "_id",
+  foreignField: "productId",
+});
 
 productSchema.virtual("finalPrice").get(function () {
   return this.price - (this.price * this.discount) / 100;
@@ -56,10 +56,13 @@ productSchema.query.search = function (keyword) {
 };
 
 productSchema.query.pagination = function (page) {
-   page = page < 1 || isNaN(page) || !page ? 1 : page;
+  page = page < 1 || isNaN(page) || !page ? 1 : page;
   const limit = 12;
   const skip = (page - 1) * limit;
   return this.find().skip(skip).limit(limit);
 };
 
+productSchema.methods.inStock = function (quantity) {
+  return this.stock >= quantity ? true : false; 
+};
 export const Product = model("Product", productSchema);
