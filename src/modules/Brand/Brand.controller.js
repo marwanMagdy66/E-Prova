@@ -42,7 +42,6 @@ export const createBrand = asyncHandler(async (req, res, next) => {
 });
 
 
-
 export const deleteBrand = asyncHandler(async (req, res, next) => {
     const brand = await Brand.findByIdAndDelete(req.params.id);
     if (!brand) return next(new Error('Brand not found', 404));
@@ -51,7 +50,7 @@ export const deleteBrand = asyncHandler(async (req, res, next) => {
     if (products.length > 0) 
         return next(new Error("Cannot delete brand with existing products", { cause: 400 }));
     await Category.updateMany({}, { $pull: { brands: req.params.id } });
-     
+    
 
     await cloudinary.uploader.destroy(brand.logo.id);
 
@@ -59,13 +58,22 @@ export const deleteBrand = asyncHandler(async (req, res, next) => {
 })
 
 export const updateBrand = asyncHandler(async (req, res, next) => {
-    const brand = await Brand.findById(req.params.id);
+        const brand = await Brand.findById(req.params.id);
+    
     if (!brand) return next(new Error("Brand not found ", { cause: 404 }))
+
+
     if (req.file) {
-        const { secure_url, public_id } = await cloudinary.uploader.upload(brand.image.id);
-        brand.image = { url: secure_url, id: public_id };
+       /*  if (brand.logo?.id) { 
+            await cloudinary.uploader.destroy(brand.logo.id);
+        } */
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
+            folder: `${process.env.Cloud_Folder_Name}/brands/${brand.name}`
+        });
+        brand.logo = { url: secure_url, id: public_id };
     }
     brand.name = req.body.name ? req.body.name : brand.name;
+
     await brand.save();
     return res.json({ success: true, message: "Brand updated successfully" });
 });
