@@ -115,7 +115,7 @@ export const allProducts = asyncHandler(async (req, res, next) => {
     productQuery = productQuery.sort(sort);
   }
   productQuery = productQuery.pagination(page);
-  const products = await productQuery;
+  const products = await productQuery
 
   return res.json({
     success: true,
