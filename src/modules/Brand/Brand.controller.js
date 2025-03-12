@@ -64,9 +64,9 @@ export const updateBrand = asyncHandler(async (req, res, next) => {
 
 
     if (req.file) {
-       /*  if (brand.logo?.id) { 
+        if (brand.logo?.id) { 
             await cloudinary.uploader.destroy(brand.logo.id);
-        } */
+        } 
         const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
             folder: `${process.env.Cloud_Folder_Name}/brands/${brand.name}`
         });
