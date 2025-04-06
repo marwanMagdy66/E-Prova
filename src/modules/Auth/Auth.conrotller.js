@@ -6,7 +6,7 @@ import { Token } from "../../../DB/models/Token.js";
 import bcryptjs from "bcryptjs";
 import randomstring from "randomstring";
 import { Cart } from "../../../DB/models/Cart.js";
-
+import { OAuth2Client } from "google-auth-library";
 
 ////register
 export const register = asyncHandler(async (req, res, next) => {
@@ -109,9 +109,9 @@ export const login = asyncHandler(async (req, res, next) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "None", // جرب "Lax" أو "None" لو الـ frontend والدومين مختلفين
+    sameSite: "None",
     maxAge: 60 * 60 * 1000,
-});
+  });
 
   return res.json({
     success: true,
@@ -173,4 +173,47 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   await user.save();
   await Token.deleteMany({ userId: user._id });
   return res.json({ success: true, message: "Password reset successfully" });
+});
+
+
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+/// login using google acc
+export const googleLogin = asyncHandler(async (req, res, next) => {
+  const { token } = req.body;
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  const payload = ticket.getPayload();
+  const { email, name } = payload;
+  let user = await User.findOne({ email });
+  if (!user) {
+    user = await User.create({
+      username: name,
+      email:email,
+      isConfirmed: true,
+      password: "google-auth",
+    });
+    await Cart.create({ userId: user._id });
+  }
+  const accessToken = jwt.sign(
+    { email, id: user._id, role: user.role },
+    process.env.SECRET_KEY,
+    { expiresIn: "5h" }
+  );
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    maxAge: 60 * 60 * 1000,
+  });
+
+  return res.json({
+    success: true,
+    message: "Logged in with Google successfully",
+    accessToken,
+  });
 });

@@ -20,4 +20,8 @@ router.post("/login", validate(authSchema.login), authController.login);
 
 router.post('/forget-code',validate(authSchema.forgetCode),authController.forgetCode)
 router.post('/reset-password',validate(authSchema.resetPassword),authController.resetPassword)
+
+
+
+router.post("/google-login", authController.googleLogin);
 export default router;
