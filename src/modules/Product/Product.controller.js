@@ -145,7 +145,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
   }
 
   if (req.body.category) {
-    const categoryExist = await Category.findById(req.body.categoryExist);
+    const categoryExist = await Category.findById(req.body.category);
     if (!categoryExist) return next(new Error("Category not found"));
     product.category = req.body.category;
   }
