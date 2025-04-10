@@ -43,7 +43,7 @@ export const createBrand = asyncHandler(async (req, res, next) => {
 
 
 export const deleteBrand = asyncHandler(async (req, res, next) => {
-    const brand = await Brand.findByIdAndDelete(req.params.id);
+    const brand = await Brand.findById(req.params.id);
     if (!brand) return next(new Error('Brand not found', 404));
     
     const products = await Product.find({ brandId: req.params.id });
@@ -53,7 +53,7 @@ export const deleteBrand = asyncHandler(async (req, res, next) => {
     
 
     await cloudinary.uploader.destroy(brand.logo.id);
-
+    await brand.remove();
     return res.json({ success: true, message: "Brand deleted successfully" });
 })
 
