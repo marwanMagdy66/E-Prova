@@ -53,7 +53,8 @@ export const deleteBrand = asyncHandler(async (req, res, next) => {
     
 
     await cloudinary.uploader.destroy(brand.logo.id);
-    await brand.remove();
+    await brand.deleteOne();
+
     return res.json({ success: true, message: "Brand deleted successfully" });
 })
 
