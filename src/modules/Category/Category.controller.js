@@ -1,5 +1,6 @@
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { Category } from "../../../DB/models/Category.js";
+import { Product } from "../../../DB/models/Product.js";
 
 
 export const getCategory = asyncHandler(async (req, res, next) => {
@@ -21,6 +22,11 @@ export const createCategory = asyncHandler(async (req, res, next) => {
 export const deleteCategory = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
   if (!category) return next(new Error("Category not found"));
+  const product=await Product.find({category:category._id})
+  if (product.length > 0) {
+    return next(new Error("Cannot delete category with existing products", { cause: 400 }));
+  }
+  
   await category.deleteOne();
   return res.json({ success: true, message: "Category deleted successfully" });
 });
