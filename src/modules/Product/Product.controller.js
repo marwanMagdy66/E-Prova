@@ -5,18 +5,31 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import cloudinary from "../../utils/cloud.js";
 import { Types } from "mongoose";
 
+// ⛅️ helper لرفع الصور باستخدام buffer
+const uploadImageToCloudinary = (fileBuffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    stream.end(fileBuffer);
+  });
+};
 
 export const create = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.body.category);
   if (!category) return next(new Error("Category not found"));
-  
+
   const brand = await Brand.findById(req.body.brandId);
   if (!brand) return next(new Error("Brand not found"));
-
 
   if (!req.files) {
     return next(new Error("Please upload a product image"));
   }
+
   const folder = req.body.name;
 
   let images = [];
@@ -24,22 +37,26 @@ export const create = asyncHandler(async (req, res, next) => {
   if (!Array.isArray(subImages)) {
     return next(new Error("sub images must be an array"));
   }
+
   for (const file of subImages) {
-    const { secure_url, public_id } = await cloudinary.uploader.upload(
-      file.path,
-      { folder: `${process.env.Cloud_Folder_Name}/products/${folder}` }
+    const { secure_url, public_id } = await uploadImageToCloudinary(
+      file.buffer,
+      `${process.env.Cloud_Folder_Name}/products/${folder}`
     );
     images.push({ url: secure_url, id: public_id });
   }
 
   if (!req.files.defaultImage || !req.files.defaultImage.length) {
-    return next(new ErrorResponse("Default image is required", 400));
+    return next(new Error("Default image is required"));
   }
 
-  const { secure_url: defaultImageUrl, public_id: defaultImageId } =
-    await cloudinary.uploader.upload(req.files.defaultImage[0].path, {
-      folder: `${process.env.Cloud_Folder_Name}/products/${folder}`,
-    });
+  const {
+    secure_url: defaultImageUrl,
+    public_id: defaultImageId,
+  } = await uploadImageToCloudinary(
+    req.files.defaultImage[0].buffer,
+    `${process.env.Cloud_Folder_Name}/products/${folder}`
+  );
 
   if (typeof req.body.attributes === "string") {
     try {
@@ -65,14 +82,10 @@ export const create = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
-
-
 export const deleteProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
-    return next(new ErrorResponse("Product not found", 404));
+    return next(new Error("Product not found"));
   }
   await product.deleteOne();
   const ids = product.images.map((image) => image.id);
@@ -86,9 +99,6 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
     message: "product deleted successfully",
   });
 });
-
-
-
 
 export const allProducts = asyncHandler(async (req, res, next) => {
   const { sort, page, keyword, category, brand } = req.query;
@@ -107,7 +117,9 @@ export const allProducts = asyncHandler(async (req, res, next) => {
     filter.brandId = new Types.ObjectId(brand);
   }
 
-  let productQuery = Product.find(filter).populate("brandId").populate("category");
+  let productQuery = Product.find(filter)
+    .populate("brandId")
+    .populate("category");
   if (keyword) {
     productQuery = productQuery.search(keyword);
   }
@@ -115,7 +127,7 @@ export const allProducts = asyncHandler(async (req, res, next) => {
     productQuery = productQuery.sort(sort);
   }
   productQuery = productQuery.pagination(page);
-  const products = await productQuery
+  const products = await productQuery;
 
   return res.json({
     success: true,
@@ -123,20 +135,13 @@ export const allProducts = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
-
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) return next(new Error("Product not found"));
 
-  product.name = req.body.name ? req.body.name : product.name;
-
-  product.price = req.body.price ? req.body.price : product.price;
-
-  product.description = req.body.description
-    ? req.body.description
-    : product.description;
+  product.name = req.body.name || product.name;
+  product.price = req.body.price || product.price;
+  product.description = req.body.description || product.description;
 
   if (req.body.brandId) {
     const brandExist = await Brand.findById(req.body.brandId);
@@ -149,15 +154,17 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     if (!categoryExist) return next(new Error("Category not found"));
     product.category = req.body.category;
   }
+
   const folder = product.name;
 
   if (req.files?.defaultImage) {
     if (product.defaultImage?.id) {
       await cloudinary.uploader.destroy(product.defaultImage.id);
     }
-    const uploadImage = await cloudinary.uploader.upload(
-      req.files.defaultImage[0].path,
-      { folder: `${process.env.Cloud_Folder_Name}/products/${folder}` }
+
+    const uploadImage = await uploadImageToCloudinary(
+      req.files.defaultImage[0].buffer,
+      `${process.env.Cloud_Folder_Name}/products/${folder}`
     );
     product.defaultImage = {
       id: uploadImage.public_id,
@@ -169,16 +176,19 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     for (let img of product.images) {
       await cloudinary.uploader.destroy(img.id);
     }
+
     const subImages = [];
     for (let file of req.files.images) {
-      const uploadImage = await cloudinary.uploader.upload(file.path, {
-        folder: `${process.env.Cloud_Folder_Name}/products/${folder}`,
-      });
+      const uploadImage = await uploadImageToCloudinary(
+        file.buffer,
+        `${process.env.Cloud_Folder_Name}/products/${folder}`
+      );
       subImages.push({
         id: uploadImage.public_id,
         url: uploadImage.secure_url,
       });
     }
+
     product.images = subImages;
   }
 
