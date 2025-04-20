@@ -103,7 +103,7 @@ export const login = asyncHandler(async (req, res, next) => {
   const accessToken = jwt.sign(
     { email, id: user._id, role: user.role },
     process.env.SECRET_KEY,
-    { expiresIn: "5h" }
+    { expiresIn: "24h" }
   );
 
   res.cookie("accessToken", accessToken, {
