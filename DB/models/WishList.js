@@ -9,9 +9,15 @@ const wishListSchema = Schema(
     },
     products: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Product",
-        required: true,
+        product: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          // required: true, 
+        },
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
   },
