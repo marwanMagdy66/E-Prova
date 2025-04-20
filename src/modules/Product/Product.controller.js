@@ -27,7 +27,7 @@ export const create = asyncHandler(async (req, res, next) => {
   for (const file of subImages) {
     const { secure_url, public_id } = await cloudinary.uploader.upload(
       file.path,
-      { folder: `${process.env.CLOUD_FOLDER_NAME}/products/${folder}` }
+      { folder: `${process.env.Cloud_Folder_Name}/products/${folder}` }
     );
     images.push({ url: secure_url, id: public_id });
   }
@@ -157,7 +157,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     }
     const uploadImage = await cloudinary.uploader.upload(
       req.files.defaultImage[0].path,
-      { folder: `${process.env.CLOUD_FOLDER_NAME}/products/${folder}` }
+      { folder: `${process.env.Cloud_Folder_Name}/products/${folder}` }
     );
     product.defaultImage = {
       id: uploadImage.public_id,
@@ -172,7 +172,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     const subImages = [];
     for (let file of req.files.images) {
       const uploadImage = await cloudinary.uploader.upload(file.path, {
-        folder: `${process.env.CLOUD_FOLDER_NAME}/products/${folder}`,
+        folder: `${process.env.Cloud_Folder_Name}/products/${folder}`,
       });
       subImages.push({
         id: uploadImage.public_id,
