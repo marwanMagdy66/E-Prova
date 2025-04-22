@@ -50,13 +50,11 @@ export const create = asyncHandler(async (req, res, next) => {
     return next(new Error("Default image is required"));
   }
 
-  const {
-    secure_url: defaultImageUrl,
-    public_id: defaultImageId,
-  } = await uploadImageToCloudinary(
-    req.files.defaultImage[0].buffer,
-    `${process.env.Cloud_Folder_Name}/products/${folder}`
-  );
+  const { secure_url: defaultImageUrl, public_id: defaultImageId } =
+    await uploadImageToCloudinary(
+      req.files.defaultImage[0].buffer,
+      `${process.env.Cloud_Folder_Name}/products/${folder}`
+    );
 
   if (typeof req.body.attributes === "string") {
     try {
@@ -126,7 +124,8 @@ export const allProducts = asyncHandler(async (req, res, next) => {
   if (sort) {
     productQuery = productQuery.sort(sort);
   }
-  productQuery = productQuery.pagination(page);
+  if(page)
+     productQuery = productQuery.pagination(page);
   const products = await productQuery;
 
   return res.json({
