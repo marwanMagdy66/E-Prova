@@ -192,3 +192,16 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     product,
   });
 });
+
+
+export const getProduct = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.id)
+    .populate("brandId")
+    .populate("category");
+  if (!product) return next(new Error("Product not found", { cause: 404 }));
+  return res.json({
+    success: true,
+    message: "Product retrieved successfully",
+    product,
+  });
+});

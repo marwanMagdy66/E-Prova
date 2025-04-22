@@ -20,7 +20,7 @@ export const create = joi
       )
       .required(),
     brandId: joi.string().custom(isValidObjectId).required(),
-    discount:joi.number().integer()
+    discount: joi.number().integer(),
   })
   .required();
 
@@ -45,6 +45,11 @@ export const updateProduct = joi.object({
     joi.string()
   ),
   brandId: joi.string().custom(isValidObjectId),
-  discount:joi.number().integer()
-
+  discount: joi.number().integer(),
 });
+
+export const getProduct = joi
+  .object({
+    id: joi.string().custom(isValidObjectId).required(),
+  })
+  .required();

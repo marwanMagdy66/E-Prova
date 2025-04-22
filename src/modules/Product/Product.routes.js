@@ -44,4 +44,9 @@ router.patch(
   productController.updateProduct
 );
 
+router.get(
+  "/get-product/:id",
+  validate(productSchema.getProduct),
+  productController.getProduct
+);
 export default router;
