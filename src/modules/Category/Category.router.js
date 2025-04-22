@@ -9,9 +9,6 @@ const router = Router();
 
 router.use("/:category/product", productRouter);
 
-
-
-
 //get category
 router.get("/categories", ControllerCategory.getCategory);
 
@@ -23,7 +20,6 @@ router.post(
   validate(CategorySchema.createCategory),
   ControllerCategory.createCategory
 );
-
 
 //update category
 router.patch(
@@ -47,4 +43,9 @@ router.get("/men-categories", ControllerCategory.menCategories);
 
 router.get("/women-categories", ControllerCategory.womenCategories);
 
+router.get(
+  "/get-category/:id",
+  validate(CategorySchema.getCategoryById),
+  ControllerCategory.getCategoryById
+);
 export default router;

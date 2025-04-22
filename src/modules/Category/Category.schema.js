@@ -18,3 +18,7 @@ export const updateCategory=joi.object({
 export const deleteCategory=joi.object({
     id:joi.string().custom(isValidObjectId).required()
 }).required()
+
+export const getCategoryById=joi.object({
+    id:joi.string().custom(isValidObjectId).required()
+}).required()

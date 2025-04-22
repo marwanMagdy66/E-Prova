@@ -76,3 +76,14 @@ export const womenCategories = asyncHandler(async (req, res, next) => {
   });
 
 });
+
+
+export const getCategoryById = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+  if (!category) return next(new Error("Category not found", { cause: 404 }));
+  return res.json({
+    success: true,
+    message: "category found successfully",
+    category,
+  });
+});
