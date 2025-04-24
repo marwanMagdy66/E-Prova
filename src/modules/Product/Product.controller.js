@@ -5,14 +5,12 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import cloudinary from "../../utils/cloud.js";
 import { Types } from "mongoose";
 
-
 export const create = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.body.category);
   if (!category) return next(new Error("Category not found"));
-  
+
   const brand = await Brand.findById(req.body.brandId);
   if (!brand) return next(new Error("Brand not found"));
-
 
   if (!req.files) {
     return next(new Error("Please upload a product image"));
@@ -65,10 +63,6 @@ export const create = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
-
-
 export const deleteProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
   if (!product) {
@@ -87,9 +81,6 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
   });
 });
 
-
-
-
 export const allProducts = asyncHandler(async (req, res, next) => {
   const { sort, page, keyword, category, brand } = req.query;
 
@@ -107,25 +98,26 @@ export const allProducts = asyncHandler(async (req, res, next) => {
     filter.brandId = new Types.ObjectId(brand);
   }
 
-  let productQuery = Product.find(filter).populate("brandId").populate("category");
+  let productQuery = Product.find(filter)
+    .populate("brandId")
+    .populate("category");
   if (keyword) {
     productQuery = productQuery.search(keyword);
   }
   if (sort) {
     productQuery = productQuery.sort(sort);
   }
-  if(page)
-    productQuery = productQuery.pagination(page);
-  const products = await productQuery
+  if (page) productQuery = productQuery.pagination(page);
+  const products = await productQuery;
+  const totalProducts = await Product.countDocuments(filter);
+  const totalPages = Math.ceil(totalProducts / 12);
 
   return res.json({
     success: true,
     products: products,
+    totalPages: totalPages,
   });
 });
-
-
-
 
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.id);
@@ -192,7 +184,6 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     product,
   });
 });
-
 
 export const getProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.id)
