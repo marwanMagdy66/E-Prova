@@ -1,12 +1,23 @@
 import { Review } from "../../../DB/models/review.js";
 import { Product } from "../../../DB/models/Product.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
+import mongoose from "mongoose";
 
-
-export const allReviews = asyncHandler(async (req, res, next) => {
+/* export const allReviews = asyncHandler(async (req, res, next) => {
     const reviews = await Review.find().populate("productId").populate("userId", 'username');
     //console.log('Reviews', reviews);
     res.status(200).json({ success: true, data: reviews })
+})
+ */
+
+export const allReviews = asyncHandler(async (req, res, next) => {
+    const { productId } = req.params;
+
+    const filter = productId ? { productId: new mongoose.Types.ObjectId(productId) } : {};
+
+    const reviews = await Review.find(filter).populate("productId").populate("userId", 'username');
+
+    res.status(200).json({ success: true, data: reviews });
 })
 
 export const createReview = asyncHandler(async (req, res, next) => {
