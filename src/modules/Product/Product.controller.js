@@ -39,6 +39,14 @@ export const create = asyncHandler(async (req, res, next) => {
       folder: `${process.env.Cloud_Folder_Name}/products/${folder}`,
     });
 
+  if (!req.files.AIimage || !req.files.AIimage.length) {
+    return next(new ErrorResponse("Ai image is required", 400));
+  }
+  const { secure_url: AIimageUrl, public_id: AIimageId } =
+    await cloudinary.uploader.upload(req.files.AIimage[0].path, {
+      folder: `${process.env.Cloud_Folder_Name}/products/${folder}`,
+    });
+
   if (typeof req.body.attributes === "string") {
     try {
       req.body.attributes = JSON.parse(req.body.attributes);
@@ -54,6 +62,10 @@ export const create = asyncHandler(async (req, res, next) => {
       url: defaultImageUrl,
       id: defaultImageId,
     },
+    AIimage:{
+      url:AIimageUrl,
+      id:AIimageId
+    }
   });
 
   return res.json({
@@ -71,6 +83,7 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
   await product.deleteOne();
   const ids = product.images.map((image) => image.id);
   ids.push(product.defaultImage.id);
+  ids.push(product.AIimage.id)
   await cloudinary.api.delete_all_resources(ids);
   await cloudinary.api.delete_folder(
     `${process.env.Cloud_Folder_Name}/products/${product.name}`
@@ -154,6 +167,21 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
       { folder: `${process.env.Cloud_Folder_Name}/products/${folder}` }
     );
     product.defaultImage = {
+      id: uploadImage.public_id,
+      url: uploadImage.secure_url,
+    };
+  }
+
+  
+  if (req.files?.AIimage) {
+    if (product.AIimage?.id) {
+      await cloudinary.uploader.destroy(product.AIimage.id);
+    }
+    const uploadImage = await cloudinary.uploader.upload(
+      req.files.AIimage[0].path,
+      { folder: `${process.env.Cloud_Folder_Name}/products/${folder}` }
+    );
+    product.AIimage = {
       id: uploadImage.public_id,
       url: uploadImage.secure_url,
     };

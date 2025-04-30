@@ -15,6 +15,10 @@ const productSchema = Schema(
       id: { type: String, required: true },
       url: { type: String, required: true },
     },
+    AIimage: {
+      id: { type: String, required: true },
+      url: { type: String, required: true },
+    },
     category: { type: Types.ObjectId, ref: "Category", required: true },
     stock: { type: Number, required: true },
     discount: { type: Number, default: 0 },

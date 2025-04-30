@@ -16,6 +16,8 @@ router.post(
   isAuthorized("admin"),
   fileUpload().fields([
     { name: "defaultImage", maxCount: 1 },
+    { name: "AIimage", maxCount: 1 },
+
     { name: "images", maxCount: 5 },
   ]),
   validate(productSchema.create),
@@ -38,6 +40,7 @@ router.patch(
   isAuthorized("admin"),
   fileUpload().fields([
     { name: "defaultImage", maxCount: 1 },
+    { name: "AIimage", maxCount: 1 },
     { name: "images", maxCount: 5 },
   ]),
   validate(productSchema.updateProduct),
