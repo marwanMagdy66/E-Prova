@@ -19,7 +19,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  process.env.CLIENT_URL || "https://e-prova.vercel.app",
+  process.env.CLIENT_URL ||   'https://e-prova-ten.vercel.app',
 ];
 
 app.use((req, res, next) => {
