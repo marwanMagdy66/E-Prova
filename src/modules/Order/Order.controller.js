@@ -48,6 +48,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
         products: orderproducts,
         totalOrderPrice: totalOrderPrice,
     })
+   
 
     const updateStock = async (products) => {
         const bulkUpdateOperations = products.map((item) => ({
@@ -62,8 +63,9 @@ export const createOrder = asyncHandler(async (req, res, next) => {
     await updateStock(orderproducts);
 
     let sessionUrl=null;
+    
     if(payment === "visa"){
-        const stripe=new Stripe(process.env.stripe_key)
+        const stripe=new Stripe(process.env.STRIPE_KEY)
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
@@ -84,6 +86,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
         });
         sessionUrl = session.url;
     }
+    
     
 
     const clearCart = async (userId) => {
