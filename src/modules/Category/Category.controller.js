@@ -4,9 +4,10 @@ import { Product } from "../../../DB/models/Product.js";
 
 
 export const getCategory = asyncHandler(async (req, res, next) => {
-  const categories = await Category.find();
+  const categories = await Category.find().populate("brands");
   return res.json({ sucess: true, categories });
 });
+
 
 export const createCategory = asyncHandler(async (req, res, next) => {
   await Category.create({
@@ -52,7 +53,7 @@ export const updateCategory = asyncHandler(async (req, res, next) => {
 
 // men categories
 export const menCategories = asyncHandler(async (req, res, next) => {
-  const categories = await Category.find({ gender: "male" });
+  const categories = await Category.find({ gender: "male" }).populate("brands");
   if (!categories) {
     return next(new Error("not found categories for men"));
   }
@@ -65,7 +66,7 @@ export const menCategories = asyncHandler(async (req, res, next) => {
 
 
 export const womenCategories = asyncHandler(async (req, res, next) => {
-  const categories = await Category.find({ gender: "female" });
+  const categories = await Category.find({ gender: "female" }).populate("brands");
   if (!categories) {
     return next(new Error("not found categories for female"));
   }
@@ -79,7 +80,7 @@ export const womenCategories = asyncHandler(async (req, res, next) => {
 
 
 export const getCategoryById = asyncHandler(async (req, res, next) => {
-  const category = await Category.findById(req.params.id);
+  const category = await Category.findById(req.params.id).populate("brands");
   if (!category) return next(new Error("Category not found", { cause: 404 }));
   return res.json({
     success: true,
