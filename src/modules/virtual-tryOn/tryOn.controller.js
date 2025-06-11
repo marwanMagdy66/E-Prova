@@ -63,6 +63,7 @@ export const tryOn = asyncHandler(async (req, res, next) => {
         headers: {
           "Content-Type": "application/json",
         },
+        timeout: 300000, // 5 minutes timeout
       }
     );
 
@@ -98,6 +99,14 @@ export const tryOn = asyncHandler(async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error in tryOn:", error.response?.data || error.message);
+    if (error.code === "ECONNABORTED") {
+      return next(
+        new Error(
+          "Request timed out. The model is taking longer than expected.",
+          { cause: 504 }
+        )
+      );
+    }
     return next(
       new Error(
         error.response?.data?.message || "Error processing virtual try-on",
