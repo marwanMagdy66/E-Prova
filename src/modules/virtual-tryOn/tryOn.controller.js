@@ -56,16 +56,31 @@ export const tryOn = asyncHandler(async (req, res, next) => {
     console.log("Human image length:", humanImageBase64.length);
     console.log("Garment image length:", garmentImageBase64.length);
 
-    const colapResponse = await axios.post(
-      "https://f97c-34-134-39-16.ngrok-free.app/virtual-tryon",
-      colapData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        timeout: 300000, // 5 minutes timeout
-      }
-    );
+    let colapResponse;
+    try {
+      colapResponse = await axios.post(
+        "https://f97c-34-134-39-16.ngrok-free.app/virtual-tryon",
+        colapData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 300000, // 5 minutes timeout
+        }
+      );
+    } catch (colapError) {
+      console.error("Colap AI Error Details:", {
+        message: colapError.message,
+        status: colapError.response?.status,
+        data: colapError.response?.data,
+        code: colapError.code,
+      });
+      throw new Error(`Colap AI Error: ${colapError.message}`);
+    }
+
+    if (!colapResponse.data || !colapResponse.data.result_image) {
+      throw new Error("Invalid response from Colap AI: Missing result image");
+    }
 
     // Convert result image to buffer and upload to Cloudinary
     const resultImageBuffer = Buffer.from(
@@ -75,18 +90,30 @@ export const tryOn = asyncHandler(async (req, res, next) => {
     const resultImageBase64 = `data:image/jpeg;base64,${colapResponse.data.result_image}`;
 
     // Upload result image to Cloudinary
-    const resultUpload = await cloudinary.uploader.upload(resultImageBase64, {
-      folder: `${process.env.Cloud_Folder_Name}/virtualOn/results/`,
-      resource_type: "image",
-    });
+    let resultUpload;
+    try {
+      resultUpload = await cloudinary.uploader.upload(resultImageBase64, {
+        folder: `${process.env.Cloud_Folder_Name}/virtualOn/results/`,
+        resource_type: "image",
+      });
+    } catch (cloudinaryError) {
+      console.error("Cloudinary Upload Error:", cloudinaryError);
+      throw new Error(`Cloudinary Upload Error: ${cloudinaryError.message}`);
+    }
 
     // Create a new virtual try-on record with the result
-    const newVirtualOn = await virtualOn.create({
-      human_image: humanImageBase64,
-      garment_image: garmentImageBase64,
-      description,
-      result_image: resultUpload.secure_url,
-    });
+    let newVirtualOn;
+    try {
+      newVirtualOn = await virtualOn.create({
+        human_image: humanImageBase64,
+        garment_image: garmentImageBase64,
+        description,
+        result_image: resultUpload.secure_url,
+      });
+    } catch (dbError) {
+      console.error("Database Error:", dbError);
+      throw new Error(`Database Error: ${dbError.message}`);
+    }
 
     res.json({
       success: true,
@@ -98,7 +125,14 @@ export const tryOn = asyncHandler(async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("Error in tryOn:", error.response?.data || error.message);
+    console.error("Error in tryOn:", {
+      message: error.message,
+      stack: error.stack,
+      response: error.response?.data,
+      status: error.response?.status,
+      code: error.code,
+    });
+
     if (error.code === "ECONNABORTED") {
       return next(
         new Error(
@@ -107,11 +141,11 @@ export const tryOn = asyncHandler(async (req, res, next) => {
         )
       );
     }
+
     return next(
-      new Error(
-        error.response?.data?.message || "Error processing virtual try-on",
-        { cause: 500 }
-      )
+      new Error(`Error processing virtual try-on: ${error.message}`, {
+        cause: error.response?.status || 500,
+      })
     );
   }
 });
