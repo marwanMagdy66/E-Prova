@@ -65,7 +65,7 @@ export const tryOn = asyncHandler(async (req, res, next) => {
           headers: {
             "Content-Type": "application/json",
           },
-          // timeout: 300000, // 5 minutes timeout
+         timeout: 300000, // 5 minutes timeout
         }
       );
     } catch (colapError) {
