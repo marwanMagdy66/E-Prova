@@ -48,7 +48,7 @@ export const createOrder = asyncHandler(async (req, res, next) => {
         products: orderproducts,
         totalOrderPrice: totalOrderPrice,
     })
-   
+
 
     const updateStock = async (products) => {
         const bulkUpdateOperations = products.map((item) => ({
@@ -69,8 +69,8 @@ export const createOrder = asyncHandler(async (req, res, next) => {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
-            success_url: "https://example.com",
-            cancel_url: "http://localhost:3000/cancel",
+            success_url: "https://e-prova-ten.vercel.app/e-prova/order/success",
+            cancel_url: "https://e-prova-ten.vercel.app/e-prova/order/faild",
             line_items: orderproducts.map((product) => {
             return {
                 price_data: {
@@ -144,4 +144,5 @@ export const getOrders = asyncHandler(async (req, res, next) => {
 
     return res.json({ success: true, data: orders })
 })
+
 
