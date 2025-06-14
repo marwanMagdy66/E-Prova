@@ -59,13 +59,13 @@ export const tryOn = asyncHandler(async (req, res, next) => {
     let colapResponse;
     try {
       colapResponse = await axios.post(
-        "https://2da7-35-226-204-19.ngrok-free.app/virtual-tryon",
+        "https://d988-35-225-128-100.ngrok-free.app/virtual-tryon",
         colapData,
         {
           headers: {
             "Content-Type": "application/json",
           },
-         timeout: 300000, // 5 minutes timeout
+          timeout: 300000, // 5 minutes timeout
         }
       );
     } catch (colapError) {
@@ -132,7 +132,7 @@ export const tryOn = asyncHandler(async (req, res, next) => {
       status: error.response?.status,
       code: error.code,
     });
-//mannn
+    //mannn
     if (error.code === "ECONNABORTED") {
       return next(
         new Error(
