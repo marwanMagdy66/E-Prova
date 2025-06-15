@@ -12,7 +12,7 @@ export const addToCart = asyncHandler(async (req, res, next) => {
     return next(new Error("Product not found", { cause: 404 }));
   }
 
-  const finalPrice = product.finalPrice; // استخدام الفاينال برايس
+  const finalPrice = product.finalPrice;
 
   if (!product.inStock(quantity)) {
     return next(
@@ -22,27 +22,22 @@ export const addToCart = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const isProductInCart = await Cart.findOne({
+  let cart = await Cart.findOne({
     userId,
     "products.productId": productId,
   });
 
-  if (isProductInCart) {
-    const theProduct = isProductInCart.products.find(
+  if (cart) {
+    const theProduct = cart.products.find(
       (product) => product.productId.toString() === productId.toString()
     );
 
     if (product.inStock(theProduct.quantity + quantity)) {
       theProduct.quantity += quantity;
-
-      isProductInCart.totalPrice += finalPrice * quantity;
-
       product.stock -= quantity;
 
       await product.save();
-      await isProductInCart.save();
-
-      return res.json({ success: true, message: "Product added to cart" });
+      await cart.save();
     } else {
       return next(
         new Error(`Sorry, only ${product.stock} items are available`, {
@@ -50,24 +45,41 @@ export const addToCart = asyncHandler(async (req, res, next) => {
         })
       );
     }
+  } else {
+    product.stock -= quantity;
+    await product.save();
+
+    cart = await Cart.findOneAndUpdate(
+      { userId },
+      {
+        $push: {
+          products: { productId, quantity },
+        },
+      },
+      { new: true, upsert: true }
+    );
   }
 
-  const totalPrice = finalPrice * quantity;
-  product.stock -= quantity;
-  await product.save();
+  // 🟩 إعادة حساب إجمالي السعر من كل المنتجات الموجودة في السلة:
+  const populatedCart = await Cart.findById(cart._id).populate("products.productId");
 
-  const cart = await Cart.findOneAndUpdate(
-    { userId },
-    {
-      $push: {
-        products: { productId, quantity },
-      },
-      $set: { totalPrice },
-    },
-    { new: true, upsert: true }
-  );
+  let newTotalPrice = 0;
+  for (const item of populatedCart.products) {
+    const prod = item.productId;
+    if (prod) {
+      const itemFinalPrice = prod.price - (prod.price * prod.discount) / 100;
+      newTotalPrice += itemFinalPrice * item.quantity;
+    }
+  }
 
-  res.json({ success: true, message: "Product added to cart", cart });
+  populatedCart.totalPrice = newTotalPrice;
+  await populatedCart.save();
+
+  res.json({
+    success: true,
+    message: "Product added to cart",
+    cart: populatedCart,
+  });
 });
 
 
