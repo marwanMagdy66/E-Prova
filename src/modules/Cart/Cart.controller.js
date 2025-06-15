@@ -12,6 +12,8 @@ export const addToCart = asyncHandler(async (req, res, next) => {
     return next(new Error("Product not found", { cause: 404 }));
   }
 
+  const finalPrice = product.finalPrice; // استخدام الفاينال برايس
+
   if (!product.inStock(quantity)) {
     return next(
       new Error(`Sorry, only ${product.stock} items are available`, {
@@ -33,7 +35,7 @@ export const addToCart = asyncHandler(async (req, res, next) => {
     if (product.inStock(theProduct.quantity + quantity)) {
       theProduct.quantity += quantity;
 
-      isProductInCart.totalPrice += product.price * quantity;
+      isProductInCart.totalPrice += finalPrice * quantity;
 
       product.stock -= quantity;
 
@@ -50,7 +52,7 @@ export const addToCart = asyncHandler(async (req, res, next) => {
     }
   }
 
-  const totalPrice = product.price * quantity;
+  const totalPrice = finalPrice * quantity;
   product.stock -= quantity;
   await product.save();
 
@@ -67,6 +69,7 @@ export const addToCart = asyncHandler(async (req, res, next) => {
 
   res.json({ success: true, message: "Product added to cart", cart });
 });
+
 
 export const getCart = asyncHandler(async (req, res, next) => {
   const userId = req.user._id;
