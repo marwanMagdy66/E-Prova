@@ -6,8 +6,8 @@ import CategoryRouter from "./src/modules/Category/Category.router.js";
 import productRouter from "./src/modules/Product/Product.routes.js";
 import brandRouter from "./src/modules/Brand/Brand.router.js";
 import reviewRouter from "./src/modules/Review/Review.router.js";
-import cartRouter from './src/modules/Cart/Cart.router.js';
-import OrderRouter from './src/modules/Order/Order.router.js';
+import cartRouter from "./src/modules/Cart/Cart.router.js";
+import OrderRouter from "./src/modules/Order/Order.router.js";
 import AIRouter from "./src/modules/virtual-tryOn/tryOn.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -20,7 +20,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  process.env.CLIENT_URL ||   'https://e-prova-ten.vercel.app',
+  process.env.CLIENT_URL || "https://e-prova-ten.vercel.app",
 ];
 
 app.use((req, res, next) => {
@@ -53,7 +53,6 @@ app.use(
   })
 );
 
-
 //connect DB
 await connectDB();
 
@@ -67,12 +66,12 @@ app.use("/Product", productRouter);
 app.use("/Review", reviewRouter);
 
 app.use("/WishList", wishListRouter);
-app.use('/Cart',cartRouter)
+app.use("/Cart", cartRouter);
 
-app.use("/Order",OrderRouter)
+app.use("/Order", OrderRouter);
 
 //virtual try on
-app.use("/AI",AIRouter)
+app.use("/AI", AIRouter);
 ///Page not found handler
 app.all("*", (req, res, next) => {
   return next(new Error(`Route  not found in this server`));

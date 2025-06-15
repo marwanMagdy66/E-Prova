@@ -59,7 +59,7 @@ export const tryOn = asyncHandler(async (req, res, next) => {
     let colapResponse;
     try {
       colapResponse = await axios.post(
-        "https://d988-35-225-128-100.ngrok-free.app/virtual-tryon",
+        "https://1d8b-34-135-78-96.ngrok-free.app/virtual-tryon",
         colapData,
         {
           headers: {
